@@ -15,9 +15,8 @@ double multimodal_Function(double x) {
 }
 
 bool IsTransition(double delta, double temp_i) {
-    std::mt19937 generator{ std::random_device{}() };
-    std::uniform_real_distribution<> dis{0, 1};
-    double value = dis(generator);
+    std::uniform_real_distribution<> dist{0, 1};
+    double value = dist(generator);
     double P = exp(-delta/temp_i);
     return value <= P;
 }
