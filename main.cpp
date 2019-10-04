@@ -1,17 +1,17 @@
 #include <iostream>
-#include <vector>
 #include <cmath>
 #include <string>
 #include <iomanip>
 #include <random>
 
+static std::mt19937 generator{ std::random_device{}() };
 
 double my_Function(double x) {
     return -sqrt(x)*sin(x);
 }
 
 double multimodal_Function(double x) {
-    return my_Function(x)*sin(5*x);
+    return my_Function(x) * sin(5 * x);
 }
 
 bool IsTransition(double delta, double temp_i) {
@@ -22,60 +22,61 @@ bool IsTransition(double delta, double temp_i) {
     return value <= P;
 }
 
-void uni_ignition_simulation_method(double a, double b, double min, double max) {
+void uni_ignition_simulation_method(double begin, double end, double min_temp, double max_temp) {
     std::cout << "\t\t\tUnimodal Function:\n\n"
     << "N\t\t" << "Temperature\t\t\t\t" << "x\t\t\t\t" << "f(x)\n";
-    double temp_i = max;
+    double current_temperature = max_temp;
 
-    std::mt19937 generator{ std::random_device{}() };
-    std::uniform_real_distribution<> dis{a, b};
-    double x1 = dis(generator);
-    double x2, delta;
+    std::uniform_real_distribution<> dis{begin, end};
+    double first_x = dis(generator);
+    double new_x, delta;
     size_t counter = 0;
-    while(temp_i > min) {
-        x2 = dis(generator);
-        delta = my_Function(x2) - my_Function(x1);
+    while(current_temperature > min_temp) {
+        new_x = dis(generator);
+        delta = my_Function(new_x) - my_Function(first_x);
         if(delta <= 0) {
-            x1 = x2;
+            first_x = new_x;
         }
         else if(delta > 0) {
-            if(IsTransition(delta, temp_i)) {
-                x1 = x2;
+            if(IsTransition(delta, current_temperature)) {
+                first_x = new_x;
             }
         }
         counter++;
-        std::cout << counter<< std::fixed << std::setprecision(7)  << "\t|\t" << temp_i << "  \t|\t" << x1 << "\t|\t" << my_Function(x1) << std::endl;
-        temp_i *= 0.95;
+        std::cout << counter<< std::fixed << std::setprecision(7)  << "\t|\t" << current_temperature
+                  << "  \t|\t" << first_x
+                  << "\t|\t" << my_Function(first_x) << std::endl;
+        current_temperature *= 0.95;
     }
-    std::cout << "X: " << x1 << "    Y: " << my_Function(x1) << std::endl;
+    std::cout << "X: " << first_x << "    Y: " << my_Function(first_x) << std::endl;
 }
 
-void multi_ignition_simulation_method(double a, double b, double min, double max) {
+void multi_ignition_simulation_method(double begin, double end, double min_temp, double max_temp) {
     std::cout << "\t\t\tMultimodal Function:\n\n"
               << "N\t\t" << "Temperature\t\t\t\t" << "x\t\t\t\t" << "f(x)\n";
-    double temp_i = max;
-
-    std::mt19937 generator{ std::random_device{}() };
-    std::uniform_real_distribution<> dis{a, b};
-    double x1 = dis(generator);
-    double x2, delta;
+    double current_temperature = max_temp;
+    std::uniform_real_distribution<> dis{begin, end};
+    double first_x = dis(generator);
+    double new_x, delta;
     size_t counter = 0;
-    while(temp_i > min) {
-        x2 = dis(generator);
-        delta = multimodal_Function(x2) - multimodal_Function(x1);
+    while(current_temperature > min_temp) {
+        new_x = dis(generator);
+        delta = multimodal_Function(new_x) - multimodal_Function(first_x);
         if(delta <= 0) {
-            x1 = x2;
+            first_x = new_x;
         }
         else if(delta > 0) {
-            if(IsTransition(delta, temp_i)) {
-                x1 = x2;
+            if(IsTransition(delta, current_temperature)) {
+                first_x = new_x;
             }
         }
         counter++;
-        std::cout << counter<< std::fixed << std::setprecision(7)  << "\t|\t" << temp_i << "  \t|\t" << x1 << "\t|\t" << multimodal_Function(x1) << std::endl;
-        temp_i *= 0.95;
+        std::cout << counter<< std::fixed << std::setprecision(7)  << "\t|\t" << current_temperature
+                  << "  \t|\t" << first_x
+                  << "\t|\t" << multimodal_Function(first_x) << std::endl;
+        current_temperature *= 0.95;
     }
-    std::cout << "X: " << x1 << "    Y: " << multimodal_Function(x1) << std::endl;
+    std::cout << "X: " << first_x << "    Y: " << multimodal_Function(first_x) << std::endl;
 }
 
 int main() {
@@ -84,32 +85,16 @@ int main() {
     std::cout << "Hello, user! This is test app =)\n";
     while(userChoice != "n") {
         std::cout << "\tEnter value \'a\'\n>> ";
+        std::cin >> begin;
 
-        while(!(std::cin >> begin)) {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            std::cout << "Not a value, try again\n>> ";
-        }
         std::cout << "Enter value \'b\'\n>> ";
-        while(!(std::cin >> end)) {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            std::cout << "Not a value, try again\n>> ";
-        }
+        std::cin >> end;
 
         std::cout << "Enter value min temperature:\n>> ";
-        while(!(std::cin >> min_temperature)) {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            std::cout << "Not a value, try again\n>> ";
-        }
+        std::cin >> min_temperature;
 
         std::cout << "Enter value max temperature:\n>> ";
-        while(!(std::cin >> max_temperature)) {
-            std::cin.clear();
-            std::cin.ignore(100, '\n');
-            std::cout << "Not a value, try again\n>> ";
-        }
+        std::cin >> max_temperature;
 
         uni_ignition_simulation_method(begin, end, min_temperature, max_temperature);
         multi_ignition_simulation_method(begin, end, min_temperature, max_temperature);
